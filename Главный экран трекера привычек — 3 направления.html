@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Главный экран трекера привычек — 3 направления</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@300;400;500&family=Archivo:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Archivo", sans-serif;
+    background: #ece9e4;
+    color: #26231f;
+  }
+  .page-head { max-width: 1260px; margin: 0 auto; padding: 40px 32px 8px; }
+  .page-head h1 { font-size: 15px; letter-spacing: .08em; text-transform: uppercase; line-height: 1.6; }
+  .page-head p { margin-top: 8px; font-size: 13px; color: #6b655c; max-width: 72ch; line-height: 1.6; }
+  .canvas {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    max-width: 1260px;
+    margin: 0 auto;
+    padding: 32px 32px 80px;
+  }
+  .cell { background: #fff; border-radius: 18px; overflow: hidden; box-shadow: 0 10px 34px rgba(60,55,48,.10); }
+  .cell-label { padding: 18px 22px; border-bottom: 1px solid #ece8e0; }
+  .cell-label h3 { font-size: 12px; letter-spacing: .07em; text-transform: uppercase; color: #544e45; }
+  .cell-label p { margin-top: 6px; font-size: 13px; color: #8a837a; line-height: 1.5; }
+  .cell-body { display: flex; justify-content: center; padding: 34px 0; background: #f4f1ec; }
+
+  /* Phone frame */
+  .phone {
+    width: 300px; height: 608px;
+    background: #fff;
+    border-radius: 42px;
+    padding: 14px;
+    box-shadow: 0 24px 60px rgba(30,28,24,.22), 0 0 0 2px rgba(30,28,24,.06);
+    position: relative;
+  }
+  .scr { width: 100%; height: 100%; border-radius: 30px; overflow: hidden; position: relative; display: flex; flex-direction: column; }
+
+  .badge { margin-top: 14px; text-align: center; font-size: 11px; color: #7d756a; }
+  .note { margin-top: 10px; text-align: center; font-size: 11px; color: #948c80; line-height: 1.55; max-width: 240px; margin-left: auto; margin-right: auto; }
+
+  /* ============ A · Kenya Hara / quiet wellness ============ */
+  /* System: warm ink #3d3a34 on bone #f7f5f1, delicate serif EB Garamond,
+     ~75% negative space, one quiet accent (sage), tiny captions, ring as only graphic */
+  .scr-a { background: #f7f5f1; color: #3d3a34; font-family: "EB Garamond", serif; padding: 44px 26px 0; }
+  .scr-a .top { display: flex; justify-content: space-between; align-items: baseline; }
+  .scr-a .date { font-size: 14px; letter-spacing: .06em; color: #8c867a; }
+  .scr-a .greet { margin-top: 22px; font-size: 30px; font-weight: 300; line-height: 1.15; }
+  .scr-a .sub { margin-top: 8px; font-size: 15px; color: #8c867a; font-style: italic; }
+  .scr-a .ring { margin: 30px auto 6px; width: 132px; height: 132px; border-radius: 50%;
+    background: conic-gradient(#a9b5a3 0 68%, #e7e3db 68% 100%); display: grid; place-items: center; }
+  .scr-a .ring-in { width: 106px; height: 106px; border-radius: 50%; background: #f7f5f1;
+    display: grid; place-items: center; text-align: center; }
+  .scr-a .ring-in b { font-family: "Archivo", sans-serif; font-size: 22px; font-weight: 500; letter-spacing: -.02em; }
+  .scr-a .ring-in i { display: block; font-size: 11px; font-style: normal; color: #8c867a; letter-spacing: .05em; }
+  .scr-a .hl { list-style: none; margin-top: 26px; }
+  .scr-a .hl li { padding: 13px 0; border-top: 1px solid #e7e3db; display: flex; align-items: center; gap: 12px; }
+  .scr-a .ck { width: 20px; height: 20px; border: 1px solid #c9c4b8; border-radius: 50%; flex-shrink: 0; }
+  .scr-a .hl li.done .ck { background: #a9b5a3; border-color: #a9b5a3; }
+  .scr-a .hl li .nm { font-size: 18px; }
+  .scr-a .hl li.done .nm { color: #9aa08f; text-decoration: line-through; }
+  .scr-a .hl li .st { margin-left: auto; font-size: 12px; color: #b4aea1; }
+  .scr-a .hil { border-top: none; text-align: center; margin-top: 20px; font-size: 12px; color: #b4aea1; font-style: italic; }
+
+  /* ============ B · Swiss Editorial / data-driven discipline ============ */
+  /* System: #111 on #f1eee8, single functional accent #e8381f, Archivo only,
+     numbered habits, hairline rules, oversized folio numerals, no gradients/shadows */
+  .scr-b { background: #f1eee8; color: #12100d; font-family: "Archivo", sans-serif; padding: 34px 24px 0; }
+  .scr-b .kicker { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: #7d776c; }
+  .scr-b h2 { margin-top: 8px; font-size: 30px; font-weight: 700; letter-spacing: -.02em; line-height: 1.05; }
+  .scr-b .metricrow { display: flex; align-items: flex-end; gap: 24px; margin-top: 22px; padding-bottom: 18px; border-bottom: 2px solid #12100d; }
+  .scr-b .metric { }
+  .scr-b .metric b { font-size: 34px; font-weight: 700; letter-spacing: -.03em; line-height: 1; }
+  .scr-b .metric b.accent { color: #e8381f; }
+  .scr-b .metric span { display: block; margin-top: 4px; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; color: #7d776c; }
+  .scr-b .hlist { list-style: none; }
+  .scr-b .hlist li { display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 10px;
+    padding: 15px 0; border-bottom: 1px solid #d8d3c8; }
+  .scr-b .num { font-size: 12px; color: #7d776c; }
+  .scr-b .nm { font-size: 15px; font-weight: 500; }
+  .scr-b .st { font-size: 11px; letter-spacing: .04em; color: #7d776c; }
+  .scr-b .box { width: 20px; height: 20px; border: 1.6px solid #12100d; border-radius: 2px; justify-self: end; margin-right: 4px; }
+  .scr-b .hlist li.done .box { background: #e8381f; border-color: #e8381f; }
+  .scr-b .hlist li.done .nm { color: #6b655c; text-decoration: line-through; }
+  .scr-b .foot { margin-top: 18px; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: #7d776c; }
+
+  /* ============ C · Bauhaus geometric / playful gamification ============ */
+  /* System: black + primaries (red #f03, blue #03a, yellow #fe0), Space Grotesk,
+     circles/squares as composition, rotated type, flat, tactile, no gradients */
+  .scr-c { background: #fff; color: #0b0b0b; font-family: "Space Grotesk", sans-serif; padding: 26px 20px 0; }
+  .scr-c .gridbg { position: absolute; inset: 0; background-image:
+      linear-gradient(#f0efec 1px, transparent 1px), linear-gradient(90deg, #f0efec 1px, transparent 1px);
+    background-size: 34px 34px; }
+  .scr-c .head { display: flex; align-items: center; justify-content: space-between; position: relative; }
+  .scr-c .title { font-size: 20px; font-weight: 700; }
+  .scr-c .ball { width: 34px; height: 34px; border-radius: 50%; background: #fc0; display: grid; place-items: center; font-size: 15px; transform: rotate(12deg); }
+  .scr-c .streak { position: relative; margin-top: 20px; background: #0b0b0b; color: #fff; border-radius: 16px;
+    padding: 16px; display: flex; align-items: center; gap: 14px; transform: rotate(-1.2deg); }
+  .scr-c .streak .circ { width: 62px; height: 62px; border-radius: 50%; background: #f03; display: grid; place-items: center; flex-shrink: 0; }
+  .scr-c .streak .circ b { font-size: 20px; }
+  .scr-c .streak p { font-size: 12px; line-height: 1.4; color: #cfcfca; }
+  .scr-c .streak p b { color: #fff; font-size: 14px; }
+  .scr-c .hlist { list-style: none; margin-top: 22px; position: relative; }
+  .scr-c .hlist li { display: flex; align-items: center; gap: 12px; padding: 13px 0; border-bottom: 2px solid #0b0b0b; }
+  .scr-c .hlist li:first-child { border-top: 2px solid #0b0b0b; }
+  .scr-c .hlist li::before { content: ""; width: 22px; height: 22px; border: 2px solid #0b0b0b; border-radius: 7px; flex-shrink: 0; }
+  .scr-c .hlist li.done::before { background: #03a; }
+  .scr-c .hlist li:nth-child(3).done::before { background: #f03; }
+  .scr-c .hlist .nm { font-size: 15px; font-weight: 500; }
+  .scr-c .hlist .st { margin-left: auto; font-size: 11px; padding: 4px 9px; border: 1.6px solid #0b0b0b; border-radius: 20px; font-weight: 700; }
+  .scr-c .hlist li.done .st { background: #fc0; }
+  .scr-c .add { margin: 26px auto 0; width: 52px; height: 52px; border-radius: 50%; background: #03a; color: #fff;
+    font-size: 30px; display: grid; place-items: center; box-shadow: 5px 5px 0 #0b0b0b; }
+
+  .tmp { font-size: 10px; text-align: center; letter-spacing: .06em; color: #a49b8e; margin-top: auto; padding: 18px 0 12px; }
+
+  @media (max-width: 960px) { .canvas { grid-template-columns: 1fr; max-width: 400px; } }
+</style>
+</head>
+<body>
+
+<div class="page-head">
+  <h1>Главный экран · трекер привычек — три направления</h1>
+  <p>Один экран, три дизайн-системы. Выбери направление (или смесь), и я доведу его до полноценного прототипа: интерактивные чек-ин, недельный прогресс, статистика.</p>
+</div>
+
+<main class="canvas">
+
+  <!-- A -->
+  <section class="cell">
+    <header class="cell-label">
+      <h3>Направление A · Тихое благополучие</h3>
+      <p>Kenya Hara «пустота» · MUJI / Shiseido · ~75% воздуха, тёплый минимализм, один приглушённый акцент. Трекер как медитация, не как приборная панель.</p>
+    </header>
+    <div class="cell-body">
+      <div class="phone"><div class="scr scr-a">
+        <div class="top"><span class="date">ВТ · 22 СЕН</span><span class="date" style="font-size:12px">07:30</span></div>
+        <p class="greet">Доброе утро.</p>
+        <p class="sub">Тихий старт — 68% дня уже прожито по плану.</p>
+        <div class="ring"><div class="ring-in"><b>68%</b><i>сегодня</i></div></div>
+        <ul class="hl">
+          <li class="done"><span class="ck"></span><span class="nm">Вода · 1,5 л</span><span class="st">день 12</span></li>
+          <li class="done"><span class="ck"></span><span class="nm">Медитация 10 мин</span><span class="st">день 41</span></li>
+          <li><span class="ck"></span><span class="nm">Прогулка на свету</span><span class="st">день 6</span></li>
+          <li><span class="ck"></span><span class="nm">Сон до 23:00</span><span class="st">день 3</span></li>
+        </ul>
+        <p class="hil">— оставшееся не торопит —</p>
+        <p class="tmp">скетч: чек-ин → лёгкая вибрация</p>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- B -->
+  <section class="cell">
+    <header class="cell-label">
+      <h3>Направление B · Точная дисциплина</h3>
+      <p>Swiss Editorial · Pentagram / Vignelli · ч/б + один функциональный акцент, Hairlines, огромные цифры. Трекер как система учёта: данные главнее настроения.</p>
+    </header>
+    <div class="cell-body">
+      <div class="phone"><div class="scr scr-b">
+        <p class="kicker">02 — Ежедневный отчёт</p>
+        <h2>22 сентября</h2>
+        <div class="metricrow">
+          <div class="metric"><b>6<span style="font-size:14px">/9</span></b><span>закрыто</span></div>
+          <div class="metric"><b class="accent">68%</b><span>выполнение</span></div>
+          <div class="metric"><b>23</b><span>дней серия макс.</span></div>
+        </div>
+        <ul class="hlist">
+          <li class="done"><span class="num">01</span><span class="nm">Гидратация</span><span class="box"></span><span class="st">×12 дней</span></li>
+          <li class="done"><span class="num">02</span><span class="nm">Фокус-блоки</span><span class="box"></span><span class="st">×41 дней</span></li>
+          <li><span class="num">03</span><span class="nm">Тренировка</span><span class="box"></span><span class="st">×6 дней</span></li>
+          <li><span class="num">04</span><span class="nm">Режим сна</span><span class="box"></span><span class="st">×3 дней</span></li>
+        </ul>
+        <p class="foot">Следующий запуск серии: 03 · Тренировка</p>
+      </div></div>
+    </div>
+  </section>
+
+  <!-- C -->
+  <section class="cell">
+    <header class="cell-label">
+      <h3>Направление C · Игровая энергия</h3>
+      <p>Bauhaus geometric · Müller-Brockmann · чистые primary-цвета, круги, повёрнутый тип. Трекер как игра: серии, огонь, фан. Дерзко, но геометрично.</p>
+    </header>
+    <div class="cell-body">
+      <div class="phone"><div class="scr scr-c">
+        <div class="gridbg"></div>
+        <div class="head">
+          <span class="title">ПРИВЕТ, ОЛЯ!</span>
+          <span class="ball">🔥</span>
+        </div>
+        <div class="streak">
+          <div class="circ"><b>17</b></div>
+          <p><b>Серия: 17 дней</b> — личный рекорд почти<br>рядом. Ещё 4 дня до победы.</p>
+        </div>
+        <ul class="hlist">
+          <li class="done"><span class="nm">Вода</span><span class="st">12 дн</span></li>
+          <li class="done"><span class="nm">Зарядка</span><span class="st">41 дн</span></li>
+          <li class="done"><span class="nm">Учеба 25 мин</span><span class="st">6 дн</span></li>
+          <li><span class="nm">Сон до 23:00</span><span class="st">3 дн</span></li>
+        </ul>
+        <div class="add">＋</div>
+        <p class="tmp">скетч: тап → чек «прыгает» с рычагом круга</p>
+      </div></div>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>
