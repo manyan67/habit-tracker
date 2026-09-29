@@ -77,11 +77,18 @@ export function useDocSync({ shapes, replaceShapes, isInteracting }: UseDocSyncO
   // ---- Poll каждые 700 мс: замена, если version изменилась и не взаимодействуем ----
   useEffect(() => {
     let disposed = false
+    let pollTimer: ReturnType<typeof setInterval> | null = null
 
     const tick = async (): Promise<void> => {
       if (isInteractingRef.current()) return
       try {
         const res = await fetch("/api/doc")
+        // Статический хостинг (GitHub Pages): моста нет и не будет — глушим поллинг.
+        if (res.status === 404) {
+          if (pollTimer !== null) clearInterval(pollTimer)
+          pollTimer = null
+          return
+        }
         if (!res.ok || disposed) return
         const doc = (await res.json()) as { version: number; shapes: unknown[] }
         if (disposed) return
@@ -94,10 +101,10 @@ export function useDocSync({ shapes, replaceShapes, isInteracting }: UseDocSyncO
       }
     }
 
-    const pollTimer = setInterval(tick, POLL_MS)
+    pollTimer = setInterval(tick, POLL_MS)
     return () => {
       disposed = true
-      clearInterval(pollTimer)
+      if (pollTimer !== null) clearInterval(pollTimer)
     }
   }, [])
 
