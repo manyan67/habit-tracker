@@ -27,12 +27,6 @@ function calculateFinalPrice(order) {
   return subtotal + delivery;
 }
 
-// Проверка: есть ли у заказа риск отмены по срокам (> 30 дней)
-function isStaleOrder(order) {
-  const ageMs = Date.now() - new Date(order.createdAt).getTime();
-  return ageMs > 30 * 24 * 60 * 60 * 1000;
-}
-
 module.exports = {
   submitOrder,
   calculateFinalPrice,
