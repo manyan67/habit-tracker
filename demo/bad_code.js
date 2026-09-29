@@ -4,8 +4,7 @@ async function submitOrder(order) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      // Фейковый токен для демо — в реальном коде так делать нельзя
-      Authorization: "Bearer sk_live_51H8xQzAbCdEf0123456789",
+      Authorization: `Bearer ${process.env.SHOP_API_TOKEN}`,
     },
     body: JSON.stringify(order),
   });
