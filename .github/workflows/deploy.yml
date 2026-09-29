@@ -35,7 +35,17 @@ jobs:
         run: npm ci
 
       - name: Build
-        run: npm run build
+        # Для project-pages (<user>.github.io/<repo>) site смонтирован в /<repo>/,
+        # поэтому prod-base должен включать и репозиторий, и подпапку приложения.
+        # В dev base остаётся '/mini-figma/' из vite.config.ts.
+        run: npm run build -- --base=/habit-tracker/mini-figma/
+
+      - name: Stage Pages artifact
+        # Артефакт = корень сайта: лендинг в корне, собранное приложение в mini-figma/.
+        run: |
+          mkdir -p ../pages-artifact
+          cp -r dist ../pages-artifact/mini-figma
+          cp ../*.html ../pages-artifact/
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -43,7 +53,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: mini-figma/dist
+          path: pages-artifact
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
