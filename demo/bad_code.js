@@ -15,14 +15,18 @@ async function submitOrder(order) {
   return resp.json();
 }
 
+// НДС 20% включён в итог; самовывоз — скидка 5%
+const VAT_RATE = 1.2;
+const PICKUP_DISCOUNT_RATE = 0.95;
+
 // Считаем итог к оплате: самовывоз — скидка 5%
 function calculateFinalPrice(order) {
   const delivery = order.delivery === "pickup" ? 0 : order.deliveryPrice;
   const subtotal = order.userItems.reduce((total, item) => {
-    return total + item.price * item.quantity * 1.2;
+    return total + item.price * item.quantity * VAT_RATE;
   }, 0);
   if (order.delivery === "pickup") {
-    return subtotal * 0.95;
+    return subtotal * PICKUP_DISCOUNT_RATE;
   }
   return subtotal + delivery;
 }
