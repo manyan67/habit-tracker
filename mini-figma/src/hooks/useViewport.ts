@@ -5,12 +5,14 @@ import {
   useState,
   type PointerEvent as ReactPointerEvent,
 } from "react"
-import type { Point } from "../types/shape"
+import type { Point, Shape } from "../types/shape"
 import { screenToCanvas, type Viewport } from "../utils/geometry"
 
 const MIN_ZOOM = 0.1
 const MAX_ZOOM = 4
 const ZOOM_STEP = 1.1
+const FIT_PADDING = 80
+const FIT_MIN_ZOOM = 0.25
 
 function clampZoom(zoom: number): number {
   return Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, zoom))
@@ -121,6 +123,42 @@ export function useViewport() {
     }))
   }, [])
 
+  /** Вписать все фигуры в окно с отступом 80px (зум ограничен 25%–400%). */
+  const zoomToFit = useCallback((shapes: Shape[]) => {
+    const el = containerRef.current
+    if (!el || shapes.length === 0) return
+    const rect = el.getBoundingClientRect()
+    let minX = Infinity
+    let minY = Infinity
+    let maxX = -Infinity
+    let maxY = -Infinity
+    for (const shape of shapes) {
+      minX = Math.min(minX, shape.x)
+      minY = Math.min(minY, shape.y)
+      maxX = Math.max(maxX, shape.x + shape.width)
+      maxY = Math.max(maxY, shape.y + shape.height)
+    }
+    const boundsW = Math.max(maxX - minX, 1)
+    const boundsH = Math.max(maxY - minY, 1)
+    const nextZoom = Math.min(
+      MAX_ZOOM,
+      Math.max(
+        FIT_MIN_ZOOM,
+        Math.min(
+          (rect.width - FIT_PADDING * 2) / boundsW,
+          (rect.height - FIT_PADDING * 2) / boundsH,
+        ),
+      ),
+    )
+    const centerX = minX + (maxX - minX) / 2
+    const centerY = minY + (maxY - minY) / 2
+    setViewport({
+      zoom: nextZoom,
+      x: rect.width / 2 - centerX * nextZoom,
+      y: rect.height / 2 - centerY * nextZoom,
+    })
+  }, [])
+
   useEffect(() => {
     centerViewport()
   }, [centerViewport])
@@ -160,6 +198,7 @@ export function useViewport() {
     viewport,
     spacePressed,
     isPanning,
+    zoomToFit,
     handlePointerDown,
     handlePointerMove,
     handlePointerUp: endPan,

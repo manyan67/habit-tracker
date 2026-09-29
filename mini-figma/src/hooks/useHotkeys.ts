@@ -2,10 +2,25 @@ import { useEffect, useRef } from "react"
 import { HOTKEYS, REDO_HOTKEY, UNDO_HOTKEY, type KeyCombo } from "../constants/tools"
 import type { Tool } from "../types/shape"
 
+const DELETE_HOTKEYS: KeyCombo[] = [{ code: "Delete" }, { code: "Backspace" }]
+const DUPLICATE_HOTKEY: KeyCombo = { code: "KeyD", ctrl: true }
+const COPY_HOTKEY: KeyCombo = { code: "KeyC", ctrl: true }
+const PASTE_HOTKEY: KeyCombo = { code: "KeyV", ctrl: true }
+const SELECT_ALL_HOTKEY: KeyCombo = { code: "KeyA", ctrl: true }
+const ZOOM_FIT_HOTKEY: KeyCombo = { code: "Digit1", shift: true }
+const ESCAPE_HOTKEY: KeyCombo = { code: "Escape" }
+
 interface UseHotkeysOptions {
   onToolSelect: (tool: Tool) => void
   onUndo?: () => void
   onRedo?: () => void
+  onDelete?: () => void
+  onDuplicate?: () => void
+  onCopy?: () => void
+  onPaste?: () => void
+  onSelectAll?: () => void
+  onZoomFit?: () => void
+  onEscape?: () => void
 }
 
 /** Комбинация, которая одновременно использует ctrl и alt, не обрабатываем. */
@@ -31,36 +46,68 @@ function isEditableTarget(target: EventTarget | null): boolean {
   )
 }
 
-export function useHotkeys({ onToolSelect, onUndo, onRedo }: UseHotkeysOptions) {
-  const toolHandler = useRef(onToolSelect)
-  const undoHandler = useRef(onUndo)
-  const redoHandler = useRef(onRedo)
+export function useHotkeys(options: UseHotkeysOptions) {
+  const optionsRef = useRef(options)
 
   useEffect(() => {
-    toolHandler.current = onToolSelect
-    undoHandler.current = onUndo
-    redoHandler.current = onRedo
+    optionsRef.current = options
   })
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.defaultPrevented || isEditableTarget(event.target)) return
+      const actions = optionsRef.current
 
       if (matchesCombo(event, UNDO_HOTKEY)) {
         event.preventDefault()
-        undoHandler.current?.()
+        actions.onUndo?.()
         return
       }
       if (matchesCombo(event, REDO_HOTKEY)) {
         event.preventDefault()
-        redoHandler.current?.()
+        actions.onRedo?.()
+        return
+      }
+      if (DELETE_HOTKEYS.some((combo) => matchesCombo(event, combo))) {
+        event.preventDefault()
+        actions.onDelete?.()
+        return
+      }
+      if (matchesCombo(event, DUPLICATE_HOTKEY)) {
+        event.preventDefault()
+        actions.onDuplicate?.()
+        return
+      }
+      if (matchesCombo(event, COPY_HOTKEY)) {
+        event.preventDefault()
+        actions.onCopy?.()
+        return
+      }
+      if (matchesCombo(event, PASTE_HOTKEY)) {
+        event.preventDefault()
+        actions.onPaste?.()
+        return
+      }
+      if (matchesCombo(event, SELECT_ALL_HOTKEY)) {
+        event.preventDefault()
+        actions.onSelectAll?.()
+        return
+      }
+      if (matchesCombo(event, ZOOM_FIT_HOTKEY)) {
+        event.preventDefault()
+        actions.onZoomFit?.()
+        return
+      }
+      if (matchesCombo(event, ESCAPE_HOTKEY)) {
+        event.preventDefault()
+        actions.onEscape?.()
         return
       }
 
       const tool = HOTKEYS[event.code]
       if (tool && !event.ctrlKey && !event.metaKey && !event.altKey) {
         event.preventDefault()
-        toolHandler.current(tool)
+        actions.onToolSelect(tool)
       }
     }
 

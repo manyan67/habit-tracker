@@ -1,6 +1,16 @@
-export type Tool = "select" | "rectangle" | "ellipse"
+export type Tool = "select" | "rectangle" | "ellipse" | "text"
 
-export type ShapeKind = "rectangle" | "ellipse"
+export type ShapeKind = "rectangle" | "ellipse" | "text"
+
+export type HandlePosition =
+  | "nw"
+  | "n"
+  | "ne"
+  | "w"
+  | "e"
+  | "sw"
+  | "s"
+  | "se"
 
 export interface Point {
   x: number
@@ -24,4 +34,9 @@ export interface Shape {
   fill: string
   stroke: string
   rotation: number
+  text?: string
+  fontSize?: number
+  name?: string
+  visible?: boolean
+  strokeWeight?: number
 }

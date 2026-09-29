@@ -1,8 +1,9 @@
 import { useState } from "react"
-import type { PointerEvent as ReactPointerEvent } from "react"
-import type { Point, Shape, Tool } from "../types/shape"
+import type { MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent } from "react"
+import type { HandlePosition, Point, Shape, Tool } from "../types/shape"
 import { screenToCanvas, type Viewport } from "../utils/geometry"
 import ShapeElement from "./Shape"
+import TextEditor from "./TextEditor"
 
 const GRID_MINOR = 20
 const GRID_MAJOR = 100
@@ -16,6 +17,12 @@ interface CanvasProps {
   shapes: Shape[]
   selectedIds: string[]
   draft?: Omit<Shape, "id"> | null
+  editingShape?: Shape | null
+  onTextCommit?: (text: string) => void
+  onTextCancel?: () => void
+  onHandlePointerDown: (handle: HandlePosition, event: ReactPointerEvent) => void
+  onShapeDoubleClick?: (shape: Shape, event: ReactMouseEvent) => void
+  onCanvasDoubleClick?: (event: ReactMouseEvent) => void
   onPointerDown: (event: ReactPointerEvent) => void
   onPointerMove: (event: ReactPointerEvent) => void
   onPointerUp: (event: ReactPointerEvent) => void
@@ -31,6 +38,12 @@ export default function Canvas({
   shapes,
   selectedIds,
   draft,
+  editingShape,
+  onTextCommit,
+  onTextCancel,
+  onHandlePointerDown,
+  onShapeDoubleClick,
+  onCanvasDoubleClick,
   onPointerDown,
   onPointerMove,
   onPointerUp,
@@ -56,6 +69,7 @@ export default function Canvas({
   return (
     <div
       ref={containerRef}
+      data-testid="canvas"
       className={`relative h-full w-full overflow-hidden bg-[#1e1e1e] select-none touch-none ${cursorClass}`}
       style={{
         backgroundImage: [
@@ -75,6 +89,7 @@ export default function Canvas({
       onPointerMove={handlePointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerCancel}
+      onDoubleClick={onCanvasDoubleClick}
     >
       <div
         className="absolute left-0 top-0 origin-top-left"
@@ -82,13 +97,25 @@ export default function Canvas({
           transform: `translate(${viewport.x}px, ${viewport.y}px) scale(${viewport.zoom})`,
         }}
       >
-        {shapes.map((shape) => (
-          <ShapeElement
-            key={shape.id}
-            shape={shape}
-            selected={selectedIds.includes(shape.id)}
-          />
-        ))}
+        {shapes.map((shape) => {
+          const selected = selectedIds.includes(shape.id)
+          const interactive =
+            tool === "select" && selectedIds.length === 1 && selected
+          return (
+            <ShapeElement
+              key={shape.id}
+              shape={shape}
+              selected={selected}
+              interactive={interactive}
+              onHandlePointerDown={onHandlePointerDown}
+              onDoubleClick={
+                onShapeDoubleClick
+                  ? (event) => onShapeDoubleClick(shape, event)
+                  : undefined
+              }
+            />
+          )
+        })}
         {draft && (
           <ShapeElement
             key="draft"
@@ -96,10 +123,16 @@ export default function Canvas({
             selected={false}
           />
         )}
+        {editingShape && onTextCommit && (
+          <TextEditor shape={editingShape} onCommit={onTextCommit} onCancel={onTextCancel} />
+        )}
       </div>
 
       {canvasPoint && (
-        <div className="pointer-events-none absolute bottom-3 left-3 z-10 rounded-md border border-white/10 bg-black/60 px-2 py-1 font-mono text-[11px] text-neutral-300 backdrop-blur">
+        <div
+          data-testid="canvas-hud"
+          className="pointer-events-none absolute bottom-3 left-3 z-10 rounded-md border border-white/10 bg-black/60 px-2 py-1 font-mono text-[11px] text-neutral-300 backdrop-blur"
+        >
           {canvasPoint.x.toFixed(1)}, {canvasPoint.y.toFixed(1)} · {Math.round(
             viewport.zoom * 100,
           )}

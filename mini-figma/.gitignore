@@ -22,3 +22,14 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Playwright
+test-results
+playwright-report
+
+# MCP server build
+mcp-server/dist
+
+# Runtime document (пишется app/MCP/e2e — не исходник)
+mcp-server/doc.json
+mcp-server/doc.json*.tmp

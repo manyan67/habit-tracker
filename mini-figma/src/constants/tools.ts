@@ -10,6 +10,7 @@ export const TOOLS: ToolDefinition[] = [
   { id: "select", label: "Select", hotkey: "V" },
   { id: "rectangle", label: "Rectangle", hotkey: "R" },
   { id: "ellipse", label: "Ellipse", hotkey: "O" },
+  { id: "text", label: "Text", hotkey: "T" },
 ]
 
 export const DEFAULT_TOOL: Tool = "select"
@@ -29,6 +30,7 @@ export const HOTKEYS: Record<string, Tool> = {
   KeyV: "select",
   KeyR: "rectangle",
   KeyO: "ellipse",
+  KeyT: "text",
 }
 
 /** Горячие клавиши истории изменений. */
