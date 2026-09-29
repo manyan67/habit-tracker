@@ -1,32 +1,42 @@
-# React + TypeScript + Vite
+# mini-figma
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Минимальный веб-редактор (аналог Figma, sprint-1 по правилу Парето) + MCP-сервер.
 
-Currently, two official plugins are available:
+## Стек
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Vite 8 + React 19 + TypeScript + Tailwind 4
+- MCP-сервер на stdio (`mcp-server/`), инструменты `mf_*` — без внешних зависимостей
+- E2E: Playwright 1.63 (`e2e/`), workers: 1 (общий `doc.json`)
 
-## React Compiler
+## S1 (Pareto 20/80) — что уже есть
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Отрисовка rect/ellipse/text (V/R/O/T), hit-test с поворотом
+- Выделение (клик/Shift-мультиселект/перетаскивание), resize-хэндлы (8, anchor-модель)
+- Delete / Ctrl+D / Ctrl+C / Ctrl+V / Ctrl+A / Ctrl+Z / Ctrl+Shift+Z / Escape / Shift+1
+- Undo/Redo (кнопки + хоткеи), история до 50 шагов
+- Слои: клик-выбор, переименование, видимость, z-order ↑↓, удаление
+- Properties: X/Y/W/H/Fill/Stroke/StrokeWeight/FontSize — коммит по Enter/blur
+- Zoom-to-fit, экспорт SVG (TopBar → `mini-figma.svg`)
+- **Мост MCP ↔ App**: Vite-плагин `bridge/docBridge.ts` (`GET/PUT /api/doc`) + хук
+  `src/hooks/useDocSync.ts` — общий `mcp-server/doc.json`; например, `mf_create_shape`
+  через MCP появляется на канвасе за ~1 секунду, и наоборот.
 
-## Expanding the Oxlint configuration
+## Figma-parity backlog (S2+)
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+- Marquee-выделение, группировка, snapping/align-guides, rotation-хэндлы
+- Frames/Artboards, компоненты, стили/токены, шрифты
+- Collaborative (multiplayer CRDT), комментарии, история версий
+- Миграция `mf_*` инструментов на frame-иерархию
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+## Команды
+
+```powershell
+npm run dev        # http://localhost:5173/mini-figma/
+npm run build      # tsc -b + vite build
+npm run lint       # oxlint
+npm run mcp:build  # tsc -p mcp-server/tsconfig.json -> mcp-server/dist/server.js
+npm run mcp        # stdio-сервер (используется opencode.jsonc как MCP "mini-figma")
+npm run test:e2e   # playwright test (webServer поднимается сам)
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Примечание: `doc.json` — общий ресурс; MCP-сервер и dev-бридж пишут его атомарно (tmp + rename).
