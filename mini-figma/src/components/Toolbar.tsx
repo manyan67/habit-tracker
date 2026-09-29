@@ -46,6 +46,22 @@ function ToolIcon({ tool }: { tool: ToolDefinition }) {
           />
         </svg>
       )
+    case "text":
+      return (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <text
+            x="12"
+            y="17"
+            textAnchor="middle"
+            fontSize="15"
+            fontWeight="600"
+            fontFamily="Inter, system-ui, sans-serif"
+            fill="currentColor"
+          >
+            T
+          </text>
+        </svg>
+      )
   }
 }
 
@@ -59,6 +75,7 @@ export default function Toolbar({ activeTool, onSelect }: ToolbarProps) {
             <button
               key={tool.id}
               type="button"
+              data-testid={`tool-${tool.id}`}
               title={`${tool.label} — ${tool.hotkey}`}
               onClick={() => onSelect(tool.id)}
               className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors ${

@@ -69,14 +69,15 @@ export function pointInShape(shape: Shape, point: Point): boolean {
   const dx = point.x - cx
   const dy = point.y - cy
 
+  /** Локальные координаты относительно угла фигуры (0..width, 0..height). */
   const local: Point = {
-    x: dx * cos - dy * sin + shape.width / 2,
-    y: dx * sin + dy * cos + shape.height / 2,
+    x: dx * cos - dy * sin + shape.x + shape.width / 2,
+    y: dx * sin + dy * cos + shape.y + shape.height / 2,
   }
 
   if (shape.kind === "ellipse") {
-    const nx = (local.x - shape.width / 2) / (shape.width / 2)
-    const ny = (local.y - shape.height / 2) / (shape.height / 2)
+    const nx = (local.x - shape.x - shape.width / 2) / (shape.width / 2)
+    const ny = (local.y - shape.y - shape.height / 2) / (shape.height / 2)
     return nx * nx + ny * ny <= 1
   }
 
